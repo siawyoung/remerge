@@ -1,0 +1,49 @@
+{
+  "name": "remerge",
+  "version": "0.0.1",
+  "description": "State simplified.",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava --tap | tap-nyan",
+    "prepublish": "babel src --out-dir lib --ignore merge.js && babel src/merge.js -o index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siawyoung/remerge.git"
+  },
+  "keywords": [
+    "javascript",
+    "merge",
+    "state",
+    "redux",
+    "react"
+  ],
+  "author": "Lau Siaw Young",
+  "contributors": [
+    "Lau Siaw Young <lausiawyoung@gmail.com> (https://github.com/siawyoung)",
+    "Matthew Cheok (https://github.com/matthewcheok)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/siawyoung/remerge/issues"
+  },
+  "homepage": "https://github.com/siawyoung/remerge#readme",
+  "devDependencies": {
+    "ava": "^0.12.0",
+    "babel-cli": "^6.5.1",
+    "babel-core": "^6.5.2",
+    "babel-preset-es2015": "^6.5.0",
+    "babel-preset-stage-2": "^6.5.0",
+    "babel-register": "^6.5.2",
+    "deep-freeze": "0.0.1",
+    "tap-nyan": "0.0.2"
+  },
+  "dependencies": {
+    "lodash": "^4.5.1"
+  },
+  "ava": {
+    "require": [
+      "babel-register"
+    ]
+  }
+}
