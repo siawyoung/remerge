@@ -1,20 +1,31 @@
-
-import _ from 'lodash'
-
-export const addArrayReducer = (
+/**
+ * Reducer that inserts a value to an array
+ * @param  {any}    action.data        The element to be added
+ * @param  {number} action.insertIndex The index to be inserted
+ */
+export const arrayInsertReducer = (
   state,
   action
 ) => {
-  const newState = _.cloneDeep(state)
-  newState.push(action.data)
-  return newState
+  const index = action.insertIndex == undefined ? state.length : action.insertIndex
+  return [
+  ...state.slice(0, index),
+  action.data,
+  ...state.slice(index),
+  ]
 }
 
-export const deleteArrayReducer = (
+/**
+ * Reducer that removes an element from an array
+ * @param  {number} action.deleteIndex The index to be removed
+ */
+export const arrayDeleteReducer = (
   state,
   action
 ) => {
-  const newState = _.cloneDeep(state)
-  newState.splice([action.deleteId], 1)
-  return newState
+  const index = action.deleteIndex
+  return [
+    ...state.slice(0, index),
+    ...state.slice(index + 1),
+  ]
 }
