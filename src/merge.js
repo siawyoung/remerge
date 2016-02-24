@@ -7,6 +7,7 @@
  */
 
 import _ from 'lodash'
+import shallowCopy from 'shallow-copy'
 
 const merge = (map) => {
 
@@ -53,7 +54,7 @@ const merge = (map) => {
 
     const currentPath = action.type.split('.', 1)[0]
 
-    const newState = _.cloneDeep(state)
+    const newState = shallowCopy(state)
 
     for (const path of Object.keys(_map)) {
       if (path === currentPath) {
@@ -74,7 +75,9 @@ const merge = (map) => {
           const newSmallerState = _process(smallerMap, smallerState, smallerAction)
 
           if (accessorKeyName) {
-            newState[key][action[accessorKeyName]] = newSmallerState
+            let collection = shallowCopy(newState[key])
+            collection[action[accessorKeyName]] = newSmallerState
+            newState[key] = collection
           } else {
             newState[key] = newSmallerState
           }
