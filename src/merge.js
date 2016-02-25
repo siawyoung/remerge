@@ -7,10 +7,11 @@
  */
 
 import _ from 'lodash'
+import shallowCopy from 'shallow-copy'
 
 const merge = (map) => {
 
-  const getAccessorKey = (key) => {
+  const _getAccessorKey = (key) => {
     // this regex tests if the key is of the form abc[123], with opening and closing square brackets
     const containsAccessor = /\w+\[\w+\]$/.test(key)
     if (containsAccessor) {
@@ -26,24 +27,23 @@ const merge = (map) => {
     }
   }
 
-  const removeAccessorKey = (key) => {
-    if (getAccessorKey(key)) {
-      return key.replace(getAccessorKey(key), "")
+  const _removeAccessorKey = (key) => {
+    if (_getAccessorKey(key)) {
+      return key.replace(_getAccessorKey(key), "")
     }
     return key
   }
 
-  const _preprocess = (_originalMap) => {
-    const _map = _.cloneDeep(_originalMap)
+  const _preprocess = (map) => {
     const newMap = {}
 
-    for (const key in _originalMap) {
-      const isFunction = _.isFunction(_map[key])
-      newMap[removeAccessorKey(key)] = {
+    for (const key in map) {
+      const isFunction = _.isFunction(map[key])
+      newMap[_removeAccessorKey(key)] = {
         key: /([^\[]+)/.exec(key)[1],
         isLeaf: isFunction,
-        accessorKeyName: getAccessorKey(key),
-        child: isFunction ? _map[key] : _preprocess(_map[key])
+        accessorKeyName: _getAccessorKey(key),
+        child: isFunction ? map[key] : _preprocess(map[key])
       }
     }
 
@@ -54,7 +54,7 @@ const merge = (map) => {
 
     const currentPath = action.type.split('.', 1)[0]
 
-    const newState = _.cloneDeep(state)
+    const newState = shallowCopy(state)
 
     for (const path of Object.keys(_map)) {
       if (path === currentPath) {
@@ -75,7 +75,9 @@ const merge = (map) => {
           const newSmallerState = _process(smallerMap, smallerState, smallerAction)
 
           if (accessorKeyName) {
-            newState[key][action[accessorKeyName]] = newSmallerState
+            let collection = shallowCopy(newState[key])
+            collection[action[accessorKeyName]] = newSmallerState
+            newState[key] = collection
           } else {
             newState[key] = newSmallerState
           }
