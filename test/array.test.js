@@ -9,19 +9,19 @@ import test from 'ava'
 import deepFreeze from 'deep-freeze'
 
 import merge from '../src/merge'
-import { addArrayReducer, deleteArrayReducer } from '../src/arrayReducers'
+import { arrayInsertReducer, arrayDeleteReducer } from '../src/arrayReducers'
 import { updateReducer } from '../src/updateReducers'
 
 const arrayReducer = merge({
   'models': {
-    'add': addArrayReducer,
-    'delete': deleteArrayReducer
+    'add': arrayInsertReducer,
+    'delete': arrayDeleteReducer
   },
   'models[modelId]': {
     'update': updateReducer,
     'fields': {
-      'add': addArrayReducer,
-      'delete': deleteArrayReducer
+      'add': arrayInsertReducer,
+      'delete': arrayDeleteReducer
     },
     'fields[fieldId]': {
       'update': updateReducer
@@ -51,6 +51,30 @@ test('Add model', (t) => {
   t.same(arrayReducer(stateBefore, action), stateAfter)
 })
 
+test('Insert model', (t) => {
+  const action = {
+    type  : 'models.add',
+    data: {
+      name: 'model1'
+    },
+    insertIndex: 0,
+  }
+
+  const stateBefore = {
+    models: [ {name: 'model2'} ]
+  }
+  const stateAfter = {
+    models: [ {name: 'model1'}, {name: 'model2'} ]
+  }
+
+  deepFreeze(action)
+  deepFreeze(stateBefore)
+  deepFreeze(stateAfter)
+
+  t.same(arrayReducer(stateBefore, action), stateAfter)
+})
+
+
 test('Update model', (t) => {
   const action = {
     type  : 'models[].update',
@@ -77,7 +101,7 @@ test('Update model', (t) => {
 test('Delete model', (t) => {
   const action = {
     type: 'models.delete',
-    deleteId: 1
+    deleteIndex: 1
   }
 
   const stateBefore = {
@@ -177,7 +201,7 @@ test('Delete field of model', (t) => {
   const action = {
     type : 'models[].fields.delete',
     modelId: 0,
-    deleteId: 0
+    deleteIndex: 0
   }
 
   const stateBefore = {

@@ -9,13 +9,13 @@ import test from 'ava'
 import deepFreeze from 'deep-freeze'
 
 import merge from '../src/merge'
-import { addObjectReducer, deleteObjectReducer } from '../src/objectReducers'
+import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
 import { updateReducer } from '../src/updateReducers'
 
 const objectReducer = merge({
   'models': {
-    'add': addObjectReducer,
-    'delete': deleteObjectReducer
+    'add': objectInsertReducer,
+    'delete': objectDeleteReducer
   },
   'models[modelId]': {
     'update': updateReducer
@@ -23,10 +23,10 @@ const objectReducer = merge({
 })
 
 
-test('Add model', (t) => {
+test('Insert model', (t) => {
   const action = {
     type: 'models.add',
-    addId: 'abcde',
+    insertKey: 'abcde',
     data: { name: 'model abcde' }
   }
 
@@ -81,7 +81,7 @@ test('Update model', (t) => {
 test('Delete model', (t) => {
   const action = {
     type: 'models.delete',
-    deleteId: 'abcde'
+    deleteKey: 'abcde'
   }
 
   const stateBefore = {

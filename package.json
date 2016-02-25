@@ -4,7 +4,7 @@
   "description": "State simplified.",
   "main": "index.js",
   "scripts": {
-    "test": "ava --tap | tap-nyan",
+    "test": "ava --tap -v | tap-nyan",
     "prepublish": "babel src --out-dir lib --ignore merge.js && babel src/merge.js -o index.js"
   },
   "repository": {

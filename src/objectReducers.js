@@ -1,20 +1,27 @@
-
-import _ from 'lodash'
-
-export const addObjectReducer = (
+/**
+ * Reducer that inserts a value to an object
+ * @param  {any}    action.data      The element to be added
+ * @param  {string} action.insertKey The key to use
+ */
+export const objectInsertReducer = (
   state,
   action
 ) => {
-  const newState = _.cloneDeep(state)
-  newState[action.addId] = action.data
-  return newState
+  return {
+    ...state,
+    [`${action.insertKey}`]: action.data
+  }
 }
 
-export const deleteObjectReducer = (
+/**
+ * Reducer that removes a value from an object
+ * @param  {string} action.deleteKey The key to use
+ */
+export const objectDeleteReducer = (
   state,
   action
 ) => {
-  const newState = _.cloneDeep(state)
-  delete newState[action.deleteId]
+  let newState = {...state}
+  delete newState[action.deleteKey]
   return newState
 }
