@@ -14,6 +14,7 @@ import { updateReducer } from '../src/updateReducers'
 
 const arrayReducer = merge({
   'models': {
+    '_': [],
     'add': arrayInsertReducer,
     'delete': arrayDeleteReducer
   },
@@ -27,6 +28,15 @@ const arrayReducer = merge({
       'update': updateReducer
     }
   }
+})
+
+test('Initial state', (t) => {
+  const stateAfter = {
+    models: []
+  }
+
+  deepFreeze(stateAfter)
+  t.same(arrayReducer(), stateAfter)
 })
 
 test('Add model', (t) => {
@@ -138,7 +148,6 @@ test('Add field to model', (t) => {
     models: [
       {
         name: "modelz",
-        fields: []
       }
     ]
   }

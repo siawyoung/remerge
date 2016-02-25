@@ -4,7 +4,7 @@
  * @param  {number} action.insertIndex The index to be inserted
  */
 export const arrayInsertReducer = (
-  state,
+  state = [],
   action
 ) => {
   const index = action.insertIndex == undefined ? state.length : action.insertIndex

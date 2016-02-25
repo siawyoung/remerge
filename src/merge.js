@@ -50,8 +50,28 @@ const merge = (map) => {
     return newMap
   }
 
-  const _process = (_map, state, action) => {
+  const _initial = (map) => {
+    if (!map) {
+      return undefined
+    } else if (_.isFunction(map)) {
+      return undefined
+    } else if (map['_'] !== undefined) {
+      return map['_']
+    }
 
+    const newMap = {}
+    for (const key in map) {
+      if (!_getAccessorKey(key)) {
+        const result = _initial(map[key])
+        if (result !== undefined) {
+          newMap[key] = result
+        }
+      }
+    }
+    return Object.keys(newMap).length > 0 ? newMap : null
+  }
+
+  const _process = (_map, state, action) => {
     const currentPath = action.type.split('.', 1)[0]
 
     const newState = shallowCopy(state)
@@ -88,9 +108,14 @@ const merge = (map) => {
     return newState
   }
 
+  const initialState = _initial(map)
   const computedMap = _preprocess(map)
 
   return (state, action) => {
+    if (state === undefined) {
+      return initialState
+    }
+
     return _process(computedMap, state, action)
   }
 }
