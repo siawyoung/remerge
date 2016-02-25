@@ -1,6 +1,6 @@
 {
   "name": "remerge",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "State simplified.",
   "main": "index.js",
   "scripts": {
