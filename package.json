@@ -39,8 +39,7 @@
     "tap-nyan": "0.0.2"
   },
   "dependencies": {
-    "lodash": "^4.5.1",
-    "shallow-copy": "0.0.1"
+    "lodash": "^4.5.1"
   },
   "ava": {
     "require": [
