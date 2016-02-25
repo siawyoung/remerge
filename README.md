@@ -60,66 +60,67 @@ To use these default reducers, simply import them from the `lib` directory:
 A exhaustive list of default reducers that ship with Remerge include:
 
 ```js
-import { addArrayReducer, deleteArrayReducer } from 'remerge/lib/arrayReducers'
-import { addObjectReducer, deleteObjectReducer } from 'remerge/lib/objectReducers'
+import { arrayInsertReducer, arrayDeleteReducer } from 'remerge/lib/arrayReducers'
+import { objectInsertReducer, objectDeleteReducer } from 'remerge/lib/objectReducers'
 import { updateReducer } from 'remerge/lib/updateReducers'
 ```
 
-### arrayReducers
+### Array Reducers
 
-#### addArrayReducer
+#### Adding array elements
 
-`addArrayReducer` is used to append an object to the state, which is expected to be an array. `addArrayReducer` expects the object to be appended to be indicated with the `data` key:
+`arrayInsertReducer` is used to append an object to the state, which is expected to be an array. `arrayInsertReducer` expects the object to be appended to be indicated with the `data` key and optionally, the index `insertIndex`:
 
 ```js
 const addItemAction = {
   type: 'items.add',
+  insertIndex: 0,
   data: {
     name: 'model'
   }
 }
 ```
 
-#### deleteArrayReducer
+#### Deleting array elements
 
-`deleteArrayReducer` is used to remove an object by index from the state, which is expeced to be an array. `deleteArrayReducer` expects the index of the object to be indicated with the `deleteId` key:
+`arrayDeleteReducer` is used to remove an object by index from the state, which is expeced to be an array. `arrayDeleteReducer` expects the index of the object to be indicated with the `deleteIndex` key:
 
 
 ```js
 const deleteItemAction = {
   type: 'items.delete',
-  deleteId: 1
+  deleteIndex: 1
 }
 ```
 
-### objectReducers
+### Object Reducers
 
-#### addObjectReducer
+#### Inserting object keys
 
-`addArrayReducer` is used to add a key-value pair to the state, which is expected to be an object. `addArrayReducer` expects the key to be indicated with the `addId` key, and the value to be indicated with the `data` key:
+`objectInsertReducer` is used to add a key-value pair to the state, which is expected to be an object. `objectInsertReducer` expects the key to be indicated with the `insertKey` key, and the value to be indicated with the `data` key:
 
 ```js
 const addItemAction = {
   type: 'items.add',
-  addId: 'apple',
+  insertKey: 'apple',
   data: { name: 'a yummy apple' }
 }
 ```
 
 If there is an existing key in the object, it is overwritten.
 
-#### deleteObjectReducer
+#### Deleting object keys
 
-`deleteArrayReducer` is used to remove a key-value pair from the state, which is expected to be an object. `deleteArrayReducer` expects the key to be indicated with the `deleteId` key:
+`objectDeleteReducer` is used to remove a key-value pair from the state, which is expected to be an object. `objectDeleteReducer` expects the key to be indicated with the `deleteKey` key:
 
 ```js
 const deleteItemAction = {
   type: 'models.delete',
-  deleteId: 'apple'
+  deleteKey: 'apple'
 }
 ```
 
-### updateReducers
+### Update Reducers
 
 #### updateReducer
 
@@ -128,7 +129,6 @@ const deleteItemAction = {
 ```js
 const updateItemAction = {
   type: 'items[].update',
-  itemId: 'apple',
   data: { name: 'a yummier apple' }
 }
 ```
