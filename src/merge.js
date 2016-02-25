@@ -7,7 +7,7 @@
  */
 
 import _ from 'lodash'
-import shallowCopy from 'shallow-copy'
+import { isMap } from './utils'
 
 const merge = (map) => {
 
@@ -74,7 +74,7 @@ const merge = (map) => {
   const _process = (_map, state, action) => {
     const currentPath = action.type.split('.', 1)[0]
 
-    const newState = shallowCopy(state)
+    const newState = _.clone(state)
 
     for (const path of Object.keys(_map)) {
       if (path === currentPath) {
@@ -84,23 +84,44 @@ const merge = (map) => {
 
           return child(newState, action)
 
-        } else {
+        } else if (accessorKeyName) {
 
           const smallerMap = child
-          const smallerState = accessorKeyName ? newState[key][action[accessorKeyName]] : newState[key]
+          let smallerState
+
+          if (isMap(newState[key])) {
+            smallerState = newState[key].get(action[accessorKeyName])
+          } else {
+            smallerState = newState[key][action[accessorKeyName]]
+          }
+
           const smallerAction = {
             ...action,
             type: action.type.split('.').splice(1).join(".")
           }
           const newSmallerState = _process(smallerMap, smallerState, smallerAction)
 
-          if (accessorKeyName) {
-            let collection = shallowCopy(newState[key])
-            collection[action[accessorKeyName]] = newSmallerState
-            newState[key] = collection
+          let collection = _.clone(newState[key])
+
+          if (isMap(newState[key])) {
+            collection.set(action[accessorKeyName], newSmallerState)
           } else {
-            newState[key] = newSmallerState
+            collection[action[accessorKeyName]] = newSmallerState
           }
+
+          newState[key] = collection
+
+        } else {
+
+          const smallerMap = child
+          const smallerState = newState[key]
+          const smallerAction = {
+            ...action,
+            type: action.type.split('.').splice(1).join(".")
+          }
+          const newSmallerState = _process(smallerMap, smallerState, smallerAction)
+          newState[key] = newSmallerState
+
         }
       }
     }
