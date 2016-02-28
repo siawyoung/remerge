@@ -14,14 +14,27 @@ import { updateReducer } from '../src/updateReducers'
 
 const objectReducer = merge({
   'models': {
+    '_': {},
     'add': objectInsertReducer,
     'delete': objectDeleteReducer
   },
   'models[modelId]': {
-    'update': updateReducer
+    'update': updateReducer,
+    'fields': {
+      'add': objectInsertReducer
+    }
   }
 })
 
+
+test('Initial state', (t) => {
+  const stateAfter = {
+    models: {}
+  }
+
+  deepFreeze(stateAfter)
+  t.same(objectReducer(), stateAfter)
+})
 
 test('Insert model', (t) => {
   const action = {
@@ -101,5 +114,42 @@ test('Delete model', (t) => {
   deepFreeze(stateBefore)
   deepFreeze(stateAfter)
 
+  t.same(objectReducer(stateBefore, action), stateAfter)
+})
+
+test('Initial state of objectInsertReducer', (t) => {
+  const action = {
+    type: 'models[].fields.add',
+    modelId: 'abcde',
+    insertKey: 'field 1',
+    data: {
+      name: 'field 1'
+    }
+  }
+
+  const stateBefore = {
+    models: {
+      abcde: {
+        name: 'abcde'
+      }
+    }
+  }
+
+  const stateAfter = {
+    models: {
+      abcde: {
+        name: 'abcde',
+        fields: {
+          'field 1': {
+            name: 'field 1'
+          }
+        }
+      }
+    }
+  }
+
+  deepFreeze(action)
+  deepFreeze(stateBefore)
+  deepFreeze(stateAfter)
   t.same(objectReducer(stateBefore, action), stateAfter)
 })

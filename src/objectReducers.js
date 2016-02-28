@@ -4,7 +4,7 @@
  * @param  {string} action.insertKey The key to use
  */
 export const objectInsertReducer = (
-  state,
+  state = {},
   action
 ) => {
   return {
