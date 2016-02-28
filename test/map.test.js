@@ -9,12 +9,25 @@ import { updateReducer } from '../src/updateReducers'
 
 const mapReducer = merge({
   'models': {
+    '_': new Map(),
     'add': mapInsertReducer,
     'delete': mapDeleteReducer
   },
   'models[modelId]': {
-    'update': updateReducer
+    'update': updateReducer,
+    'fields': {
+      'add': mapInsertReducer
+    }
   }
+})
+
+test('Initial state', (t) => {
+  const stateAfter = {
+    models: new Map()
+  }
+
+  deepFreeze(stateAfter)
+  t.same(mapReducer(), stateAfter)
 })
 
 test('Add model', (t) => {
@@ -82,5 +95,34 @@ test('Delete model', (t) => {
   deepFreeze(stateBefore)
   deepFreeze(stateAfter)
 
+  t.same(mapReducer(stateBefore, action), stateAfter)
+})
+
+test('Initial state of mapInsertReducer', (t) => {
+  const action = {
+    type: 'models[].fields.add',
+    modelId: 'abcde',
+    insertKey: 'field 1',
+    data: {
+      name: 'field 1'
+    }
+  }
+
+  const stateBefore = {
+    models: new Map([['abcde', {
+      name: 'model abcde'
+    }]])
+  }
+
+  const stateAfter = {
+    models: new Map([['abcde', {
+      name: 'model abcde',
+      fields: new Map([['field 1', { name: 'field 1' }]])
+    }]])
+  }
+
+  deepFreeze(action)
+  deepFreeze(stateBefore)
+  deepFreeze(stateAfter)
   t.same(mapReducer(stateBefore, action), stateAfter)
 })

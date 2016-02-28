@@ -2,7 +2,7 @@
 import _ from 'lodash'
 
 export const mapInsertReducer = (
-  state,
+  state = new Map(),
   action
 ) => {
   const newState = _.clone(state)
