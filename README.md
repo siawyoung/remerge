@@ -120,6 +120,10 @@ const deleteItemAction = {
 }
 ```
 
+### Map Reducers
+
+Map Reducers have the exact same API as Object Reducers -  that is, `mapInsertReducer` and `mapDeleteReducer` both expect `insertKey`, `deleteKey`, and `data`.
+
 ### Update Reducers
 
 #### updateReducer
