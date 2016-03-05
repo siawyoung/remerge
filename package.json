@@ -2,10 +2,10 @@
   "name": "remerge",
   "version": "0.0.3",
   "description": "State simplified.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "ava --tap -v | tap-nyan",
-    "prepublish": "babel src --out-dir lib --ignore merge.js && babel src/merge.js -o index.js"
+    "prepublish": "rimraf lib && babel src --out-dir lib"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "babel-preset-stage-2": "^6.5.0",
     "babel-register": "^6.5.2",
     "deep-freeze": "0.0.1",
+    "rimraf": "^2.5.2",
     "tap-nyan": "0.0.2"
   },
   "dependencies": {
