@@ -13,19 +13,18 @@ import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
 import { updateReducer } from '../src/updateReducers'
 
 const objectReducer = merge({
-  'models': {
-    '_': {},
-    'add': objectInsertReducer,
-    'delete': objectDeleteReducer
-  },
-  'models[modelId]': {
-    'update': updateReducer,
-    'fields': {
-      'add': objectInsertReducer
+  models: {
+    _: {},
+    add: objectInsertReducer,
+    delete: objectDeleteReducer,
+    $modelId: {
+      update: updateReducer,
+      fields: {
+        add: objectInsertReducer
+      }
     }
   }
-})
-
+}, true)
 
 test('Initial state', (t) => {
   const stateAfter = {
@@ -65,7 +64,7 @@ test('Insert model', (t) => {
 
 test('Update model', (t) => {
   const action = {
-    type: 'models[].update',
+    type: 'models.update',
     modelId: 'abcde',
     data: { name: 'updated model abcde' }
   }
@@ -119,7 +118,7 @@ test('Delete model', (t) => {
 
 test('Initial state of objectInsertReducer', (t) => {
   const action = {
-    type: 'models[].fields.add',
+    type: 'models.fields.add',
     modelId: 'abcde',
     insertKey: 'field 1',
     data: {

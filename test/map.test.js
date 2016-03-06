@@ -8,18 +8,18 @@ import { mapInsertReducer, mapDeleteReducer } from '../src/mapReducers'
 import { updateReducer } from '../src/updateReducers'
 
 const mapReducer = merge({
-  'models': {
-    '_': new Map(),
-    'add': mapInsertReducer,
-    'delete': mapDeleteReducer
-  },
-  'models[modelId]': {
-    'update': updateReducer,
-    'fields': {
-      'add': mapInsertReducer
+  models: {
+    _: new Map(),
+    add: mapInsertReducer,
+    delete: mapDeleteReducer,
+    $modelId: {
+      update: updateReducer,
+      fields: {
+        add: mapInsertReducer
+      }
     }
   }
-})
+}, true)
 
 test('Initial state', (t) => {
   const stateAfter = {
@@ -55,7 +55,7 @@ test('Add model', (t) => {
 
 test('Update model', (t) => {
   const action = {
-    type: 'models[].update',
+    type: 'models.update',
     modelId: 'abcde',
     data: {
       name: 'updated model abcde'
@@ -100,7 +100,7 @@ test('Delete model', (t) => {
 
 test('Initial state of mapInsertReducer', (t) => {
   const action = {
-    type: 'models[].fields.add',
+    type: 'models.fields.add',
     modelId: 'abcde',
     insertKey: 'field 1',
     data: {
