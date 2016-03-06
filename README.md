@@ -2,139 +2,174 @@
 
 State simplified.
 
+The sole purpose of Remerge is to provide a consistent interface for defining and manipulating state. It is extremely easy and intuitive to use once you get the hang of it. While there is a slight learning curve, hopefully our examples will ease the learning process.
+
+Although Remerge was built for use with Redux, it can also be used standalone. (full example apps coming soon!) It is completely framework-agnostic.
+
 ## Getting started
+
+**Install**
 
 ```
 npm install remerge --save
 ```
 
-Remerge exposes a single top-level `merge` function, which takes an object that specifies the shape and behavior of your state tree using a familiar syntax, and returns a pure function that takes your existing state tree object as its first argument, and a state mutation action as its second argument, and returns a deep copy of the mutated state tree object.
+>This example can be found in [`examples/basic`](examples/basic.js).
+
+**Define a Remerge schema**
 
 ```js
 import merge from 'remerge'
-import { addArrayReducer, deleteArrayReducer } from 'remerge/lib/arrayReducers'
-import { updateReducer } from 'remerge/lib/updateReducers'
 
-const mainReducer = merge({
-  "items": {
-    "add": addArrayReducer,
-    "delete": deleteArrayReducer
-  },
-  "items[itemId]": {
-    "update": updateReducer
+const reducer = merge({
+  todos: {
+    _: [],
+    add: todoAddReducer,
+    delete: todoDeleteReducer
   }
 })
 ```
 
-## State Mutation
-
-Remerge expects state tree mutation actions to consist of at least a `type` key that determines the path that the action takes as it navigates through the state tree, as well as any other accessor keys that you've defined in the remerge reducer schema (in this case `itemId`).
-
-As an example, an action that adds an item to the top-level `items` array in the state tree:
+**Define reducers**
 
 ```js
-const addItemAction = {
-  type  : 'items.add',
-  data: {
-    name: 'item1'
+const todoAddReducer = (
+  state = [],
+  action
+) => {
+  return state.concat(action.todo)
+}
+
+const todoDeleteReducer = (
+  state = [],
+) => {
+  state.pop()
+  return state
+}
+```
+
+**Initialize the state tree**
+
+```js
+const initialState = reducer()
+```
+
+**Mutate the state tree with actions**
+
+```js
+const addTodo = {
+  type: 'todos.add',
+  todo: {
+    title: 'Buy milk'
   }
 }
 
-const stateBefore = {
-  items: []
+const state1 = reducer(initialState, addTodo)
+
+const deleteTodo = {
+  type: 'todos.delete'
 }
 
-const stateAfter = {
-  items: [ {name: 'item1'} ]
-}
-
-assertDeepEqual(mainReducer(stateBefore, addItemAction), stateAfter) // true
+const state2 = reducer(state1, deleteTodo)
 ```
 
-## Convenience Reducers
+```js
+// state1
+{ todos:
+  [
+    { title: 'Buy milk' }
+  ]
+}
 
-Remerge ships with some default reducers to manipulate common structures such as arrays and plain objects. Support for more modern structures such as maps are also expected to come soon.
+// state2
+{
+  todos: []
+}
+```
 
-To use these default reducers, simply import them from the `lib` directory:
+**Tada! You now have a live and working state tree.**
 
-A exhaustive list of default reducers that ship with Remerge include:
+These steps are explained in greater detail below.
+
+### Remerge Schema
+
+Remerge exposes a single top-level `merge` function, which takes an object.
+
+```js
+const reducer = merge({
+  todos: {
+    _: [],
+    add: todoAddReducer,
+    delete: todoDeleteReducer
+  }
+})
+```
+
+This object, also called a **schema**, is a convention of Remerge. It specifies the shape and behavior of your state tree using a familiar and intuitive syntax.
+
+With this schema object, `merge` returns a pure function that serves two purposes: **setting up the initial state tree**, and **mutating it**.
+
+### Initial state
+
+The initial state of the state tree can be constructed by using the special `_` key. In this example, the initial state of `todos` is an empty array.
+
+Now, we can construct the initial state tree by calling `reducer` with no arguments.
+
+```js
+const initialState = reducer()
+```
+
+### Mutation Actions
+
+Then, in order to mutate/populate the state tree, we use actions. Actions in Remerge are plain objects that represent a mutation to the state tree. They are heavily inspired from Redux actions.
+
+```js
+const addTodo = {
+  type: 'todos.add',
+  todo: {
+    title: 'Buy milk'
+  }
+}
+
+const state1 = reducer(initialState, addTodo)
+```
+
+The function returned by `merge` takes a state tree as the first argument, the action object as the second argument, and returns the new mutated state tree.
+
+Another convention of Remerge is that it expects actions to consist of a `type` key. The `type` key represents the path that the action takes as it navigates through the state tree.
+
+### Convenience Reducers
+
+Remerge ships with some generic reducers to manipulate commonly-used collections such as arrays, plain objects, and Maps. We recommend using them extensively in your schema, only falling back your own custom reducers for more complex situations.
+
+To use them, simply import them from the `lib` directory. Below is the same example using `arrayInsertReducer` and `arrayDeleteReducer`:
 
 ```js
 import { arrayInsertReducer, arrayDeleteReducer } from 'remerge/lib/arrayReducers'
-import { objectInsertReducer, objectDeleteReducer } from 'remerge/lib/objectReducers'
-import { updateReducer } from 'remerge/lib/updateReducers'
-```
 
-### Array Reducers
-
-#### Adding array elements
-
-`arrayInsertReducer` is used to append an object to the state, which is expected to be an array. `arrayInsertReducer` expects the object to be appended to be indicated with the `data` key and optionally, the index `insertIndex`:
-
-```js
-const addItemAction = {
-  type: 'items.add',
-  insertIndex: 0,
-  data: {
-    name: 'model'
+const reducer = merge({
+  todos: {
+    _: [],
+    add: arrayInsertReducer,
+    delete: arrayDeleteReducer
   }
-}
+})
 ```
 
-#### Deleting array elements
+For in-depth documentation and an exhausive list of reducers, take a look at [`docs/convenience-reducers/README.md`](docs/convenience-reducers/README.md).
 
-`arrayDeleteReducer` is used to remove an object by index from the state, which is expeced to be an array. `arrayDeleteReducer` expects the index of the object to be indicated with the `deleteIndex` key:
+## Documentation
 
+Continue the second part of this README, starting in [Part 2 - Nesting](docs/2-nesting.md), to get a full low-down on how to use Remerge effectively!
 
-```js
-const deleteItemAction = {
-  type: 'items.delete',
-  deleteIndex: 1
-}
-```
+Then take a look at [`examples/convenience-reducers`](examples/convenience-reducers.js) for a more extensive example on using Remerge.
 
-### Object Reducers
+Example apps with Redux integration and generic JavaScript apps are coming soon!
 
-#### Inserting object keys
-
-`objectInsertReducer` is used to add a key-value pair to the state, which is expected to be an object. `objectInsertReducer` expects the key to be indicated with the `insertKey` key, and the value to be indicated with the `data` key:
-
-```js
-const addItemAction = {
-  type: 'items.add',
-  insertKey: 'apple',
-  data: { name: 'a yummy apple' }
-}
-```
-
-If there is an existing key in the object, it is overwritten.
-
-#### Deleting object keys
-
-`objectDeleteReducer` is used to remove a key-value pair from the state, which is expected to be an object. `objectDeleteReducer` expects the key to be indicated with the `deleteKey` key:
-
-```js
-const deleteItemAction = {
-  type: 'models.delete',
-  deleteKey: 'apple'
-}
-```
-
-### Update Reducers
-
-#### updateReducer
-
-`updateReducer` is used to update the state, which is expected to be an array or an object. `updateReducer` expects the updated object to be indicated with the `data` key:
-
-```js
-const updateItemAction = {
-  type: 'items[].update',
-  data: { name: 'a yummier apple' }
-}
-```
-
-## Contributing
-
-### Tests
+## Tests
 
 Remerge includes a fairly comprehensive test suite that also doubles as documentation. Run it with `npm test`.
+
+## License
+
+MIT

@@ -1,5 +1,6 @@
 
 import colors from 'colors'
+import util from 'util'
 
 export function isMap(obj) {
   return Object.getPrototypeOf(obj) === Map.prototype
@@ -16,6 +17,10 @@ export function debug(map, state, action) {
   console.log('current action')
   console.log(action)
   console.log('----------------------')
+}
+
+export function printTree(obj) {
+  console.log(util.inspect(obj, false, null))
 }
 
 export function getCollectionElement(collection, key) {
