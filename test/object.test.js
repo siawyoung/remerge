@@ -8,7 +8,7 @@
 import test from 'ava'
 import deepFreeze from 'deep-freeze'
 
-import merge from '../src/merge'
+import merge from '../src'
 import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
 import { updateReducer } from '../src/updateReducers'
 
