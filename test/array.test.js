@@ -13,22 +13,23 @@ import { arrayInsertReducer, arrayDeleteReducer } from '../src/arrayReducers'
 import { updateReducer } from '../src/updateReducers'
 
 const arrayReducer = merge({
-  'models': {
-    '_': [],
-    'add': arrayInsertReducer,
-    'delete': arrayDeleteReducer
-  },
-  'models[modelId]': {
-    'update': updateReducer,
-    'fields': {
-      'add': arrayInsertReducer,
-      'delete': arrayDeleteReducer
-    },
-    'fields[fieldId]': {
-      'update': updateReducer
+  models: {
+    _: [],
+    add: arrayInsertReducer,
+    delete: arrayDeleteReducer,
+    $modelId: {
+      update: updateReducer,
+      fields: {
+        add: arrayInsertReducer,
+        delete: arrayDeleteReducer,
+        $fieldId: {
+          update: updateReducer
+        }
+      }
     }
   }
-})
+}, true)
+
 
 test('Initial state', (t) => {
   const stateAfter = {
@@ -87,7 +88,7 @@ test('Insert model', (t) => {
 
 test('Update model', (t) => {
   const action = {
-    type  : 'models[].update',
+    type  : 'models.update',
     modelId: 0,
     data: {
       name: 'updatedModel'
@@ -136,7 +137,7 @@ test('Delete model', (t) => {
 
 test('Add field to model', (t) => {
   const action = {
-    type : 'models[].fields.add',
+    type : 'models.fields.add',
     modelId: 0,
     data: {
       name: "field a",
@@ -171,7 +172,7 @@ test('Add field to model', (t) => {
 
 test('Update field of model', (t) => {
   const action = {
-    type : 'models[].fields[].update',
+    type : 'models.fields.update',
     modelId: 0,
     fieldId: 1,
     data: {
@@ -208,7 +209,7 @@ test('Update field of model', (t) => {
 
 test('Delete field of model', (t) => {
   const action = {
-    type : 'models[].fields.delete',
+    type : 'models.fields.delete',
     modelId: 0,
     deleteIndex: 0
   }

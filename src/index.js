@@ -7,40 +7,42 @@
  */
 
 import _ from 'lodash'
-import { isMap, consoleMessage, consoleError, consoleSuccess } from './utils'
+import {
+  isMap,
+  getCollectionElement,
+  setCollectionElement,
+  consoleMessage,
+  consoleError,
+  consoleSuccess,
+  consoleWarning,
+} from './utils'
+
+const collectionRegex = /^\$(.+)/
 
 const merge = (map, debugMode = false) => {
 
   const _getAccessorKey = (key) => {
-    // this regex tests if the key is of the form abc[123], with opening and closing square brackets
-    const containsAccessor = /\w+\[\w+\]$/.test(key)
-    if (containsAccessor) {
-      // this regex captures the content inside the square brackets
-      const captureAccessor = /.+\[(\w+)\]/.exec(key)
-      if (captureAccessor) {
-        return captureAccessor[1]
-      } else {
-        return null
-      }
+    // this regex tests if the key is of the form $abcd1234
+    const captureAccessor = collectionRegex.exec(key)
+    if (captureAccessor) {
+      return captureAccessor[1]
     } else {
       return null
     }
-  }
-
-  const _removeAccessorKey = (key) => {
-    if (_getAccessorKey(key)) {
-      return key.replace(_getAccessorKey(key), "")
-    }
-    return key
   }
 
   const _preprocess = (map) => {
     const newMap = {}
 
     for (const key in map) {
+      if (key === '_') { continue }
+      if (newMap.$) {
+        consoleWarning(`More than one collection accessor ${newMap.$.accessorKeyName}`)
+        continue
+      }
+
       const isFunction = _.isFunction(map[key])
-      newMap[_removeAccessorKey(key)] = {
-        key: /([^\[]+)/.exec(key)[1],
+      newMap[key.replace(_getAccessorKey(key), "")] = {
         isLeaf: isFunction,
         accessorKeyName: _getAccessorKey(key),
         child: isFunction ? map[key] : _preprocess(map[key])
@@ -79,50 +81,41 @@ const merge = (map, debugMode = false) => {
     for (const path of Object.keys(_map)) {
       if (path === currentPath) {
         foundPath = true
-        const { key, accessorKeyName, isLeaf, child } = _map[path]
+        const { accessorKeyName, isLeaf, child } = _map[path]
 
         if (isLeaf) {
           consoleSuccess(`Executing action at leaf node: ${currentPath.bold}`, debugMode)
           return child(newState, action)
 
-        } else if (accessorKeyName) {
-          consoleSuccess(`Navigating collection node: ${currentPath.bold}`, debugMode)
-          const smallerMap = child
-          let smallerState
-
-          if (isMap(newState[key])) {
-            smallerState = newState[key].get(action[accessorKeyName])
-          } else {
-            smallerState = newState[key][action[accessorKeyName]]
-          }
-
-          const smallerAction = {
-            ...action,
-            type: action.type.split('.').splice(1).join(".")
-          }
-          const newSmallerState = _process(smallerMap, smallerState, smallerAction)
-
-          let collection = _.clone(newState[key])
-
-          if (isMap(newState[key])) {
-            collection.set(action[accessorKeyName], newSmallerState)
-          } else {
-            collection[action[accessorKeyName]] = newSmallerState
-          }
-
-          newState[key] = collection
-
         } else {
-          consoleSuccess(`Navigation element node: ${currentPath.bold}`, debugMode)
-          const smallerMap = child
-          const smallerState = newState[key]
-          const smallerAction = {
-            ...action,
-            type: action.type.split('.').splice(1).join(".")
-          }
-          const newSmallerState = _process(smallerMap, smallerState, smallerAction)
-          newState[key] = newSmallerState
+          const collectionKeyName = child.$ && child.$.accessorKeyName
+          const collectionKey = action && action[collectionKeyName]
 
+          // child is a collection and we should enter because accessor key name is given
+          if (collectionKeyName && collectionKey !== undefined) {
+            consoleSuccess(`Navigating collection node: ${currentPath.bold}`, debugMode)
+            let newCollection = _.clone(getCollectionElement(newState, path))
+            const smallerMap = child.$.child
+            const smallerState = getCollectionElement(newCollection, collectionKey)
+            const smallerAction = {
+              ...action,
+              type: action.type.split('.').splice(1).join(".")
+            }
+
+            const newSmallerState = _process(smallerMap, smallerState, smallerAction)
+            setCollectionElement(newCollection, collectionKey, newSmallerState)
+            setCollectionElement(newState, path, newCollection)
+          } else {
+            consoleSuccess(`Navigating element node: ${currentPath.bold}`, debugMode)
+            const smallerMap = child
+            const smallerState = getCollectionElement(newState, path)
+            const smallerAction = {
+              ...action,
+              type: action.type.split('.').splice(1).join(".")
+            }
+            const newSmallerState = _process(smallerMap, smallerState, smallerAction)
+            setCollectionElement(newState, path, newSmallerState)
+          }
         }
       }
     }
