@@ -73,19 +73,20 @@ const merge = (map) => {
 
   const _process = (_map, state, action) => {
     const currentPath = action.type.split('.', 1)[0]
-
     const newState = _.clone(state)
+    var foundPath = false
 
     for (const path of Object.keys(_map)) {
       if (path === currentPath) {
+        foundPath = true
         const { key, accessorKeyName, isLeaf, child } = _map[path]
 
         if (isLeaf) {
-
+          console.log(`[remerge]: Executing action ${currentPath}`)
           return child(newState, action)
 
         } else if (accessorKeyName) {
-
+          console.log(`[remerge]: Navigating collection at ${currentPath}`)
           const smallerMap = child
           let smallerState
 
@@ -112,7 +113,7 @@ const merge = (map) => {
           newState[key] = collection
 
         } else {
-
+          console.log(`[remerge]: Navigating ${currentPath}`)
           const smallerMap = child
           const smallerState = newState[key]
           const smallerAction = {
@@ -124,6 +125,10 @@ const merge = (map) => {
 
         }
       }
+    }
+
+    if (!foundPath) {
+      console.log(`[remerge]: Could not find path ${currentPath} in state tree!`)
     }
 
     return newState
