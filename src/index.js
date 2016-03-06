@@ -7,9 +7,9 @@
  */
 
 import _ from 'lodash'
-import { isMap } from './utils'
+import { isMap, consoleMessage, consoleError, consoleSuccess } from './utils'
 
-const merge = (map) => {
+const merge = (map, debugMode = false) => {
 
   const _getAccessorKey = (key) => {
     // this regex tests if the key is of the form abc[123], with opening and closing square brackets
@@ -73,19 +73,20 @@ const merge = (map) => {
 
   const _process = (_map, state, action) => {
     const currentPath = action.type.split('.', 1)[0]
-
     const newState = _.clone(state)
+    let foundPath  = false
 
     for (const path of Object.keys(_map)) {
       if (path === currentPath) {
+        foundPath = true
         const { key, accessorKeyName, isLeaf, child } = _map[path]
 
         if (isLeaf) {
-
+          consoleSuccess(`Executing action at leaf node: ${currentPath.bold}`, debugMode)
           return child(newState, action)
 
         } else if (accessorKeyName) {
-
+          consoleSuccess(`Navigating collection node: ${currentPath.bold}`, debugMode)
           const smallerMap = child
           let smallerState
 
@@ -112,7 +113,7 @@ const merge = (map) => {
           newState[key] = collection
 
         } else {
-
+          consoleSuccess(`Navigation element node: ${currentPath.bold}`, debugMode)
           const smallerMap = child
           const smallerState = newState[key]
           const smallerAction = {
@@ -126,6 +127,10 @@ const merge = (map) => {
       }
     }
 
+    if (!foundPath) {
+      consoleError(`Could not find path: ${currentPath.bold}`, debugMode)
+    }
+
     return newState
   }
 
@@ -133,6 +138,15 @@ const merge = (map) => {
   const computedMap = _preprocess(map)
 
   return (state, action) => {
+
+    if (action === undefined) {
+      consoleMessage(`Setting up initial state tree`, debugMode)
+    } else if (!action.type) {
+      consoleError(`Action is missing type`, debugMode)
+    } else {
+      consoleMessage(`Received action with type: ${action.type.bold}`.underline, debugMode)
+    }
+
     if (state === undefined) {
       return initialState
     }
