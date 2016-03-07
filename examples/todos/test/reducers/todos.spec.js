@@ -1,112 +1,64 @@
 import expect from 'expect'
-import todos from '../../reducers/todos'
+import todoApp from '../../reducers'
+import * as actions from '../../actions'
 
-describe('todos reducer', () => {
-  it('should handle initial state', () => {
+describe('todoApp reducer', () => {
+
+  it("should handle initial state", () => {
     expect(
-      todos(undefined, {})
-    ).toEqual([])
+      todoApp())
+    .toEqual({
+      todos: [],
+      "visibilityFilter": "SHOW_ALL"
+    })
   })
 
-  it('should handle ADD_TODO', () => {
+  it("should handle todos.add", () => {
     expect(
-      todos([], {
-        type: 'ADD_TODO',
-        text: 'Run the tests',
-        id: 0
-      })
-    ).toEqual([
-      {
-        text: 'Run the tests',
-        completed: false,
-        id: 0
-      }
-    ])
-
-    expect(
-      todos([
+      todoApp(
+        todoApp(),
+        actions.addTodo('Use Redux')
+      ))
+    .toEqual({
+      todos: [
         {
-          text: 'Run the tests',
-          completed: false,
-          id: 0
-        }
-      ], {
-        type: 'ADD_TODO',
-        text: 'Use Redux',
-        id: 1
-      })
-    ).toEqual([
-      {
-        text: 'Run the tests',
-        completed: false,
-        id: 0
-      }, {
-        text: 'Use Redux',
-        completed: false,
-        id: 1
-      }
-    ])
-
-    expect(
-      todos([
-        {
-          text: 'Run the tests',
-          completed: false,
-          id: 0
-        }, {
+          id: 1,
           text: 'Use Redux',
-          completed: false,
-          id: 1
+          completed: false
         }
-      ], {
-        type: 'ADD_TODO',
-        text: 'Fix the tests',
-        id: 2
-      })
-    ).toEqual([
-      {
-        text: 'Run the tests',
-        completed: false,
-        id: 0
-      }, {
-        text: 'Use Redux',
-        completed: false,
-        id: 1
-      }, {
-        text: 'Fix the tests',
-        completed: false,
-        id: 2
-      }
-    ])
+      ],
+      "visibilityFilter": "SHOW_ALL"
+    })
   })
 
-  it('should handle TOGGLE_TODO', () => {
-    expect(
-      todos([
+  it("should handle todos.toggle", () => {
+    const initialState = todoApp(todoApp(), actions.addTodo('Use Redux'))
+    expect(todoApp(
+      initialState,
+      actions.toggleTodo(0)
+      ))
+    .toEqual({
+      todos: [
         {
-          text: 'Run the tests',
-          completed: false,
-          id: 1
-        }, {
+          id: 2,
           text: 'Use Redux',
-          completed: false,
-          id: 0
+          completed: true
         }
-      ], {
-        type: 'TOGGLE_TODO',
-        id: 1
-      })
-    ).toEqual([
-      {
-        text: 'Run the tests',
-        completed: true,
-        id: 1
-      }, {
-        text: 'Use Redux',
-        completed: false,
-        id: 0
-      }
-    ])
+      ],
+      "visibilityFilter": "SHOW_ALL"
+    })
+  })
+
+  it("should handle visibilityFilter.set", () => {
+    expect(
+      todoApp(
+        todoApp(),
+        actions.setVisibilityFilter('active')
+      ))
+    .toEqual({
+      todos: [],
+      "visibilityFilter": "active"
+    })
   })
 
 })

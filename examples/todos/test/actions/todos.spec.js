@@ -2,24 +2,27 @@ import expect from 'expect'
 import * as actions from '../../actions'
 
 describe('todo actions', () => {
-  it('addTodo should create ADD_TODO action', () => {
+  it('addTodo should create correct Remerge action', () => {
     expect(actions.addTodo('Use Redux')).toEqual({
-      type: 'ADD_TODO',
-      id: 0,
-      text: 'Use Redux'
+      type: 'todos.add',
+      data: {
+        id: 0,
+        text: 'Use Redux',
+        completed: false
+      }
     })
   })
 
-  it('setVisibilityFilter should create SET_VISIBILITY_FILTER action', () => {
+  it('setVisibilityFilter should create correct Remerge action', () => {
     expect(actions.setVisibilityFilter('active')).toEqual({
-      type: 'SET_VISIBILITY_FILTER',
-      filter: 'active'
+      type: 'visibilityFilter.set',
+      data: 'active'
     })
   })
 
-  it('toogleTodo should create TOGGLE_TODO action', () => {
+  it('toogleTodo should create correct Remerge action', () => {
     expect(actions.toggleTodo(1)).toEqual({
-      type: 'TOGGLE_TODO',
+      type: 'todos.toggle',
       id: 1
     })
   })
