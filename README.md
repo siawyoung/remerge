@@ -164,7 +164,9 @@ Continue the second part of this README, starting in [Part 2 - Nesting](docs/2-n
 
 Then take a look at [`examples/convenience-reducers`](examples/convenience-reducers.js) for a more extensive example on using Remerge.
 
-Example apps with Redux integration and generic JavaScript apps are coming soon!
+Example apps with ~~Redux integration~~ and generic JavaScript apps are coming soon!
+
+The `examples` folder now include [an example of using Remerge in a Redux app](examples/todos). The app itself was taken from [Redux's examples](https://github.com/reactjs/redux/tree/master/examples/todos), and refactored to use Remerge. The original tests have been rewritten to test Remerge's functionality as well, so if you're thinking of writing tests in your own app, this is a good starting point.
 
 ## Tests
 
