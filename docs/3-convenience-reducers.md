@@ -11,12 +11,12 @@ const reducer = merge({
     add: objectInsertReducer,
     delete: objectDeleteReducer,
     $userId: {
-      update: updateReducer,
+      update: objectUpdateReducer,
       items: {
         add: arrayInsertReducer,
         delete: arrayDeleteReducer,
         $itemIndex: {
-          update: updateReducer
+          update: objectUpdateReducer
         }
       }
     }

@@ -10,7 +10,7 @@ import deepFreeze from 'deep-freeze'
 
 import merge from '../src'
 import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
-import { updateReducer } from '../src/updateReducers'
+import { objectUpdateReducer } from '../src/updateReducers'
 
 const objectReducer = merge({
   models: {
@@ -18,7 +18,7 @@ const objectReducer = merge({
     add: objectInsertReducer,
     delete: objectDeleteReducer,
     $modelId: {
-      update: updateReducer,
+      update: objectUpdateReducer,
       fields: {
         add: objectInsertReducer
       }

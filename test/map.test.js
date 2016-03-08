@@ -5,7 +5,7 @@ import _ from 'lodash'
 
 import merge from '../src'
 import { mapInsertReducer, mapDeleteReducer } from '../src/mapReducers'
-import { updateReducer } from '../src/updateReducers'
+import { objectUpdateReducer } from '../src/updateReducers'
 
 const mapReducer = merge({
   models: {
@@ -13,7 +13,7 @@ const mapReducer = merge({
     add: mapInsertReducer,
     delete: mapDeleteReducer,
     $modelId: {
-      update: updateReducer,
+      update: objectUpdateReducer,
       fields: {
         add: mapInsertReducer
       }

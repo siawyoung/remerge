@@ -31,7 +31,7 @@ We can represent the structure of such a state tree, as well as the mutations th
 import merge from 'remerge'
 import { arrayInsertReducer, arrayDeleteReducer } from 'remerge/lib/arrayReducers'
 import { objectInsertReducer, objectDeleteReducer } from 'remerge/lib/objectReducers'
-import { updateReducer } from 'remerge/lib/updateReducers'
+import { objectUpdateReducer } from 'remerge/lib/updateReducers'
 
 const reducer = merge({
   users: {
@@ -39,12 +39,12 @@ const reducer = merge({
     add: objectInsertReducer,
     delete: objectDeleteReducer,
     $userId: {
-      update: updateReducer,
+      update: objectUpdateReducer,
       items: {
         add: arrayInsertReducer,
         delete: arrayDeleteReducer,
         $itemIndex: {
-          update: updateReducer
+          update: objectUpdateReducer
         }
       }
     }
