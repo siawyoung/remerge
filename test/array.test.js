@@ -23,7 +23,7 @@ const arrayReducer = merge({
         add: arrayInsertReducer,
         delete: arrayDeleteReducer,
         $fieldId: {
-          update: updateReducer
+          update: objectUpdateReducer
         }
       }
     }
