@@ -2,9 +2,25 @@
 
 State simplified.
 
-The sole purpose of Remerge is to provide a consistent interface for defining and manipulating state. It is extremely easy and intuitive to use once you get the hang of it. While there is a slight learning curve, hopefully our examples will ease the learning process.
+The sole purpose of Remerge is to provide a consistent interface for defining and manipulating state. It's extremely easy and intuitive to use once you get the hang of it. While there is a slight learning curve, hopefully our examples will ease the learning process.
 
 Although Remerge was built for use with Redux, it can also be used standalone. (full example apps coming soon!) It is completely framework-agnostic.
+
+## Quick links
+
+Part 1 - Basics (this)
+
+[Part 2 - Nesting](docs/2-nesting.md)
+
+[Part 3 - Convenience reducers](docs/3-convenience-reducers.md)
+
+[Part 4 - Initial state](docs/4-initial-state.md)
+
+[Part 5 - Debugging](docs/5-debugging.md)
+
+#### Examples
+
+[Redux TodoMVC, refactored with Remerge](examples/todos)
 
 ## Getting started
 
@@ -54,6 +70,13 @@ const todoDeleteReducer = (
 const initialState = reducer()
 ```
 
+```js
+// initialState
+{
+  todos: []
+}
+```
+
 **Mutate the state tree with actions**
 
 ```js
@@ -89,11 +112,11 @@ const state2 = reducer(state1, deleteTodo)
 
 **Tada! You now have a live and working state tree.**
 
-These steps are explained in greater detail below.
+These steps are explained in more detail below.
 
 ### Remerge Schema
 
-Remerge exposes a single top-level `merge` function, which takes an object.
+Remerge exposes a single top-level `merge` function, which takes a single object as an argument.
 
 ```js
 const reducer = merge({
@@ -105,7 +128,7 @@ const reducer = merge({
 })
 ```
 
-This object, also called a **schema**, is a convention of Remerge. It specifies the shape and behavior of your state tree using a familiar and intuitive syntax.
+This object, also called a **schema**, is a Remerge convention. It specifies the shape and behavior of your state tree using a familiar and intuitive syntax.
 
 With this schema object, `merge` returns a pure function that serves two purposes: **setting up the initial state tree**, and **mutating it**.
 
@@ -121,7 +144,7 @@ const initialState = reducer()
 
 ### Mutation Actions
 
-Then, in order to mutate/populate the state tree, we use actions. Actions in Remerge are plain objects that represent a mutation to the state tree. They are heavily inspired from Redux actions.
+In order to mutate/populate the state tree, we use actions. Actions in Remerge are plain objects that represent a mutation to the state tree. They are heavily inspired from Redux actions.
 
 ```js
 const addTodo = {
