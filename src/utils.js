@@ -74,3 +74,17 @@ export function consoleError(msg, debugMode) {
     console.error(`%c[remerge]%c ${msg}`, colors.red, '')
   }
 }
+
+export function consoleGrouped(msg, debugMode) {
+  if (debugMode && console.groupCollapsed) {
+    console.groupCollapsed(`%c[remerge]%c ${msg}`, colors.black, '')
+  } else if (debugMode) {
+    console.log(`%c[remerge]%c ${msg}`, colors.black, '')
+  }
+}
+
+export function consoleEndGrouped(msg, debugMode) {
+  if (debugMode && console.groupEnd) {
+    console.groupEnd()
+  }
+}

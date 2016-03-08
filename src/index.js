@@ -15,6 +15,8 @@ import {
   consoleError,
   consoleSuccess,
   consoleWarning,
+  consoleGrouped,
+  consoleEndGrouped,
 } from './utils'
 
 const collectionRegex = /^\$(.+)/
@@ -136,15 +138,17 @@ const merge = (map, debugMode = false) => {
       consoleMessage(`Setting up initial state tree`, debugMode)
     } else if (!action.type) {
       consoleError(`Action is missing type`, debugMode)
-    } else {
-      consoleMessage(`Received action with type: ${action.type}`, debugMode)
     }
 
     if (state === undefined) {
       return initialState
     }
 
-    return _process(computedMap, state, action)
+    consoleGrouped(`Received action with type: ${action.type}`, debugMode)
+    const newState = _process(computedMap, state, action)
+    consoleEndGrouped(null, debugMode)
+
+    return newState
   }
 }
 
