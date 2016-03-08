@@ -6,7 +6,7 @@ A exhaustive list of reducers that ship with Remerge include:
 import { arrayInsertReducer, arrayDeleteReducer } from 'remerge/lib/arrayReducers'
 import { objectInsertReducer, objectDeleteReducer } from 'remerge/lib/objectReducers'
 import { mapInsertReducer, mapDeleteReducer } from 'remerge/lib/mapReducers'
-import { updateReducer } from 'remerge/lib/updateReducers'
+import { objectUpdateReducer } from 'remerge/lib/updateReducers'
 ```
 
 This page serves as documentation for all of these reducers.
@@ -72,9 +72,9 @@ Map reducers - `mapInsertReducer` and `mapDeleteReducer` - are used exactly the 
 
 ### Update Reducers
 
-#### updateReducer
+#### objectUpdateReducer
 
-`updateReducer` is used to update the state, which is expected to be an array or an object. `updateReducer` expects the updated object to be indicated with the `data` key:
+`objectUpdateReducer` is used to update the state, which is expected to be an object. `objectUpdateReducer` expects the updated object to be indicated with the `data` key:
 
 ```js
 const updateItemAction = {

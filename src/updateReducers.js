@@ -1,6 +1,5 @@
 
-// both arrays and objects can be updated the same way
-export const updateReducer = (
+export const objectUpdateReducer = (
   state,
   action
 ) => ({

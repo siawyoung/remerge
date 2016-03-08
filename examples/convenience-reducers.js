@@ -2,7 +2,7 @@
 import merge from '../src'
 import { arrayInsertReducer, arrayDeleteReducer } from '../src/arrayReducers'
 import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
-import { updateReducer } from '../src/updateReducers'
+import { objectUpdateReducer } from '../src/updateReducers'
 import { printTree } from '../src/utils'
 
 const reducer = merge({
@@ -11,12 +11,12 @@ const reducer = merge({
     add: objectInsertReducer,
     delete: objectDeleteReducer,
     $userId: {
-      update: updateReducer,
+      update: objectUpdateReducer,
       items: {
         add: arrayInsertReducer,
         delete: arrayDeleteReducer,
         $itemId: {
-          update: updateReducer
+          update: objectUpdateReducer
         }
       }
     }
