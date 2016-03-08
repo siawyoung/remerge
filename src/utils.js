@@ -1,5 +1,4 @@
 
-import colors from 'colors'
 import util from 'util'
 
 export function isMap(obj) {
@@ -39,26 +38,39 @@ export function setCollectionElement(collection, key, value) {
   }
 }
 
+const colors = {
+    black  : "font-weight : bold; color : #000000;",
+    gray   : "font-weight : bold; color : #1B2B34;",
+    red    : "font-weight : bold; color : #EC5f67;",
+    orange : "font-weight : bold; color : #F99157;",
+    yellow : "font-weight : bold; color : #FAC863;",
+    green  : "font-weight : bold; color : #99C794;",
+    teal   : "font-weight : bold; color : #5FB3B3;",
+    blue   : "font-weight : bold; color : #6699CC;",
+    purple : "font-weight : bold; color : #C594C5;",
+    brown  : "font-weight : bold; color : #AB7967;"
+}
+
 export function consoleMessage(msg, debugMode) {
   if (debugMode) {
-    console.log('[remerge]'.cyan + ' ' + msg)
+    console.log(`%c[remerge]%c ${msg}`, colors.black, '')
   }
 }
 
 export function consoleWarning(msg, debugMode) {
   if (debugMode) {
-    console.log('[remerge]'.yellow + ' ' + msg)
+    console.log(`%c[remerge]%c ${msg}`, colors.yellow, '')
   }
 }
 
 export function consoleSuccess(msg, debugMode) {
   if (debugMode) {
-    console.log('[remerge]'.green + ' ' + msg)
+    console.log(`%c[remerge]%c ${msg}`, colors.green, '')
   }
 }
 
 export function consoleError(msg, debugMode) {
   if (debugMode) {
-    console.error('[remerge]'.red + ' ' + msg)
+    console.error(`%c[remerge]%c ${msg}`, colors.red, '')
   }
 }
