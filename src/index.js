@@ -84,7 +84,7 @@ const merge = (map, debugMode = false) => {
         const { accessorKeyName, isLeaf, child } = _map[path]
 
         if (isLeaf) {
-          consoleSuccess(`Executing action at leaf node: ${currentPath.bold}`, debugMode)
+          consoleSuccess(`Executing action at leaf node: ${currentPath}`, debugMode)
           return child(newState, action)
 
         } else {
@@ -93,7 +93,7 @@ const merge = (map, debugMode = false) => {
 
           // child is a collection and we should enter because accessor key name is given
           if (collectionKeyName && collectionKey !== undefined) {
-            consoleSuccess(`Navigating collection node: ${currentPath.bold}`, debugMode)
+            consoleSuccess(`Navigating collection node: ${currentPath}`, debugMode)
             let newCollection = _.clone(getCollectionElement(newState, path))
             const smallerMap = child.$.child
             const smallerState = getCollectionElement(newCollection, collectionKey)
@@ -106,7 +106,7 @@ const merge = (map, debugMode = false) => {
             setCollectionElement(newCollection, collectionKey, newSmallerState)
             setCollectionElement(newState, path, newCollection)
           } else {
-            consoleSuccess(`Navigating element node: ${currentPath.bold}`, debugMode)
+            consoleSuccess(`Navigating element node: ${currentPath}`, debugMode)
             const smallerMap = child
             const smallerState = getCollectionElement(newState, path)
             const smallerAction = {
@@ -121,7 +121,7 @@ const merge = (map, debugMode = false) => {
     }
 
     if (!foundPath) {
-      consoleError(`Could not find path: ${currentPath.bold}`, debugMode)
+      consoleError(`Could not find path: ${currentPath}`, debugMode)
     }
 
     return newState
@@ -137,7 +137,7 @@ const merge = (map, debugMode = false) => {
     } else if (!action.type) {
       consoleError(`Action is missing type`, debugMode)
     } else {
-      consoleMessage(`Received action with type: ${action.type.bold}`.underline, debugMode)
+      consoleMessage(`Received action with type: ${action.type}`, debugMode)
     }
 
     if (state === undefined) {

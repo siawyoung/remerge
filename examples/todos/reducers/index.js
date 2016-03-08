@@ -26,6 +26,6 @@ const todoApp = merge({
     _: 'SHOW_ALL',
     set: updateVisibilityReducer
   }
-})
+}, true)
 
 export default todoApp
