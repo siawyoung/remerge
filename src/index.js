@@ -17,9 +17,11 @@ import {
   consoleWarning,
   consoleGrouped,
   consoleEndGrouped,
+  debug
 } from './utils'
 
 const collectionRegex = /^\$(.+)/
+const legacyRegex     = /^__(.+)__$/
 
 const merge = (map, debugMode = false) => {
 
@@ -28,6 +30,16 @@ const merge = (map, debugMode = false) => {
     const captureAccessor = collectionRegex.exec(key)
     if (captureAccessor) {
       return captureAccessor[1]
+    } else {
+      return null
+    }
+  }
+
+  const _getLegacyAccessorKey = (key) => {
+    // this regex tests if the key is of the form __abcd__
+    const capturelegacyAccessor = legacyRegex.exec(key)
+    if (capturelegacyAccessor) {
+      return capturelegacyAccessor[1]
     } else {
       return null
     }
@@ -47,6 +59,7 @@ const merge = (map, debugMode = false) => {
       newMap[key.replace(_getAccessorKey(key), "")] = {
         isLeaf: isFunction,
         accessorKeyName: _getAccessorKey(key),
+        legacyAccessor: _getLegacyAccessorKey(key),
         child: isFunction ? map[key] : _preprocess(map[key])
       }
     }
@@ -59,31 +72,46 @@ const merge = (map, debugMode = false) => {
       return undefined
     } else if (_.isFunction(map)) {
       return undefined
-    } else if (map['_'] !== undefined) {
-      return map['_']
     }
 
-    const newMap = {}
+    let newMap = map['_'] || {}
+    let changed = map['_'] !== undefined
+
     for (const key in map) {
+      if (key === '_') { continue }
+      if (_getLegacyAccessorKey(key)) {
+        newMap[_getLegacyAccessorKey(key)] = map[key](undefined, {})
+        changed = true
+      }
+
+      // to avoid adding keys to collections
       if (!_getAccessorKey(key)) {
-        const result = _initial(map[key])
+        let result = _initial(map[key])
         if (result !== undefined) {
           newMap[key] = result
+          changed = true
         }
       }
     }
-    return Object.keys(newMap).length > 0 ? newMap : null
+
+    return changed ? newMap : null
   }
 
   const _process = (_map, state, action) => {
     const currentPath = action.type.split('.', 1)[0]
-    const newState = _.clone(state)
+    let newState = _.clone(state)
     let foundPath  = false
 
     for (const path of Object.keys(_map)) {
-      if (path === currentPath) {
+
+      const { accessorKeyName, isLeaf, child, legacyAccessor } = _map[path]
+
+      if (legacyAccessor) {
         foundPath = true
-        const { accessorKeyName, isLeaf, child } = _map[path]
+        const smallerState = getCollectionElement(newState, legacyAccessor)
+        setCollectionElement(newState, legacyAccessor, child(smallerState, action))
+      } else if (path === currentPath) {
+        foundPath = true
 
         if (isLeaf) {
           consoleSuccess(`Executing action at leaf node: ${currentPath}`, debugMode)
