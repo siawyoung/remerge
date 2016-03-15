@@ -12,10 +12,30 @@ import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
 import * as reducers from './reducers'
 import { App, Home, Foo, Bar } from './components'
 
-const reducer = combineReducers({
-  ...reducers,
-  routing: routerReducer
-})
+import merge from 'remerge'
+
+const increaseReducer = (
+  state,
+  action
+) => {
+  return state + action.amount
+}
+
+const decreaseReducer = (
+  state,
+  action
+) => {
+  return state - action.amount
+}
+
+const reducer = merge({
+  __routing__: routerReducer,
+  count: {
+    _: 1,
+    increase: increaseReducer,
+    decrease: decreaseReducer
+  }
+}, true)
 
 const DevTools = createDevTools(
   <DockMonitor toggleVisibilityKey="ctrl-h" changePositionKey="ctrl-q">

@@ -1,15 +1,13 @@
-import { INCREASE, DECREASE } from '../constants'
-
 export function increase(n) {
   return {
-    type: INCREASE,
+    type: 'count.increase',
     amount: n
   }
 }
 
 export function decrease(n) {
   return {
-    type: DECREASE,
+    type: 'count.decrease',
     amount: n
   }
 }
