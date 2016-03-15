@@ -1,5 +1,3 @@
-import { INCREASE, DECREASE } from '../constants'
-
 const initialState = {
   number: 1
 }
