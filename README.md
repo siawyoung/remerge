@@ -18,7 +18,7 @@ Part 1 - Basics (this)
 
 [Part 5 - Debugging](docs/5-debugging.md)
 
-[Part 6 - Working with third party reducers](docs/6-legacy-reducers.md)
+[Part 6 - Working with third party reducers](docs/6-third-party-reducers.md)
 
 #### Examples
 
