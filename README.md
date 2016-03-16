@@ -20,6 +20,8 @@ Part 1 - Basics (this)
 
 [Part 6 - Working with third party reducers](docs/6-third-party-reducers.md)
 
+[Part 7 - Standalone usage](docs/7-standalone-usage.md)
+
 #### Examples
 
 [Redux TodoMVC, refactored with Remerge](examples/todos)
@@ -29,6 +31,8 @@ Part 1 - Basics (this)
 This example shows how Remerge can be used in conjunction with libraries that expose reducers to hook into Redux state, such as React Router Redux and Redux Form.
 
 ## Getting started
+
+>Remerge is also distributed as a standalone script. See [Part 7 - Standalone usage](docs/7-standalone-usage.md) for more detail.
 
 **Install**
 

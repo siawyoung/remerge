@@ -35,3 +35,5 @@ const reducer = merge({
 ```
 
 Whatever is between the leading and trailing underscores will be the key that the reducer is assigned to.
+
+Continue to [Part 7 - Standalone usage](./7-standalone-usage.md).

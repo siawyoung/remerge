@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Standalone Remerge Demo</title>
+
+  <script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="   crossorigin="anonymous"></script>
+  <script src="../../dist/merge.js"></script>
+  <script src="../../dist/reducers.js"></script>
+
+</head>
+<body>
+
+  <div id="main">
+
+    <h1>Standalone Remerge Demo (with jQuery)</h1>
+
+    <p>This example demonstrates how Remerge can be used in a standalone manner as a way to store and manipulate state. No React or Redux here, ladies and gentlemen.</p>
+
+    <p>As a way to demonstrate two things at once, I've written it so that adding todos is handled by a user-defined reducer, while deleting todos is handled by Remerge's built-in <code>arrayRemoveReducer</code>. This is purely meant as a showcase.</p>
+
+    <form id="form">
+      <input type="text" id="todo-input" />
+      <button>Add Todo</button>
+    </form>
+    <ul id="list"></ul>
+  </div>
+
+  <script>
+
+    var addTodoAction = function(todo) {
+      return {
+        type: 'todos.add',
+        todo: todo
+      }
+    }
+
+    var removeTodoAction = function(index) {
+      return {
+        type: 'todos.delete',
+        deleteIndex: index
+      }
+    }
+
+    // remerge specific code and state is wrapped privately in a IIFE
+    var remerge = (function() {
+
+      var addTodoReducer = function(state, action) {
+        return state.concat(action.todo)
+      }
+
+      var reducer = merge({
+        todos: {
+          _: [],
+          add: addTodoReducer,
+          delete: reducers.arrayDeleteReducer
+        }
+      })
+
+      var currentState = reducer()
+
+      $(window).on('remerge:state_change', function() {
+
+        // "fake" declarative DOM manipulation
+        var listHTML = currentState.todos.map(function(todo, index) {
+          return '<li>' + todo + '</li>' +
+            '<button class="delete" data-todo-id= ' + index + '>X</button>'
+        }).join('')
+
+        $('#list').html(listHTML)
+
+        // reattach event listeners after redeclaring the DOM
+        $('.delete').click(function(e) {
+          var deleteIndex = $(e.target).data('todo-id')
+          remerge.stateChange(removeTodoAction(deleteIndex))
+        })
+      })
+
+      // helper function for replacing the old state with the new one
+      // and emitting an event to prompt DOM changes
+      var stateChange = function(newState) {
+        currentState = reducer(currentState, newState)
+        $(window).trigger('remerge:state_change')
+      }
+
+      return {
+        stateChange: stateChange
+      }
+
+    })()
+
+    $('#form').submit(function(e) {
+      e.preventDefault()
+      var todo = $('#todo-input').val()
+      if (todo.trim()) {
+        $('#todo-input').val('')
+        remerge.stateChange(addTodoAction(todo))
+      }
+    })
+
+  </script>
+
+</body>
+</html>
