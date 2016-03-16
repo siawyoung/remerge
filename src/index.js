@@ -6,7 +6,8 @@
  *
  */
 
-import _ from 'lodash'
+import isFunction from 'lodash.isfunction'
+import clone from 'lodash.clone'
 import {
   isMap,
   getCollectionElement,
@@ -54,12 +55,11 @@ const merge = (map, debugMode = false) => {
         continue
       }
 
-      const isFunction = _.isFunction(map[key])
       newMap[key.replace(_getAccessorKey(key), "")] = {
-        isLeaf: isFunction,
+        isLeaf: isFunction(map[key]),
         accessorKeyName: _getAccessorKey(key),
         legacyKeyName: _getLegacyKey(key),
-        child: isFunction ? map[key] : _preprocess(map[key])
+        child: isFunction(map[key]) ? map[key] : _preprocess(map[key])
       }
     }
 
@@ -69,7 +69,7 @@ const merge = (map, debugMode = false) => {
   const _initial = (map) => {
     if (!map) {
       return undefined
-    } else if (_.isFunction(map)) {
+    } else if (isFunction(map)) {
       return undefined
     }
 
@@ -98,7 +98,7 @@ const merge = (map, debugMode = false) => {
 
   const _process = (_map, state, action) => {
     const currentPath = action.type.split('.', 1)[0]
-    let newState = _.clone(state)
+    let newState = clone(state)
     let foundPath  = false
 
     for (const path of Object.keys(_map)) {
@@ -124,7 +124,7 @@ const merge = (map, debugMode = false) => {
           // child is a collection and we should enter because accessor key name is given
           if (collectionKeyName && collectionKey !== undefined) {
             consoleSuccess(`Navigating collection node: ${currentPath}`, debugMode)
-            let newCollection = _.clone(getCollectionElement(newState, path))
+            let newCollection = clone(getCollectionElement(newState, path))
             const smallerMap = child.$.child
             const smallerState = getCollectionElement(newCollection, collectionKey)
             const smallerAction = {
