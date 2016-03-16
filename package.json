@@ -40,7 +40,8 @@
     "tap-nyan": "0.0.2"
   },
   "dependencies": {
-    "lodash": "^4.5.1"
+    "lodash.clone": "^4.3.1",
+    "lodash.isfunction": "^3.0.8"
   },
   "ava": {
     "require": [

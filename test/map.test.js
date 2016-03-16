@@ -1,7 +1,6 @@
 
 import test from 'ava'
 import deepFreeze from 'deep-freeze'
-import _ from 'lodash'
 
 import merge from '../src'
 import { mapInsertReducer, mapDeleteReducer } from '../src/mapReducers'
