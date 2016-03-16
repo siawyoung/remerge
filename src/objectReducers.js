@@ -25,3 +25,15 @@ export const objectDeleteReducer = (
   delete newState[action.deleteKey]
   return newState
 }
+
+/**
+ * Reducer that updates an object
+ * @param  {any} action.data The element to update
+ */
+export const objectUpdateReducer = (
+  state,
+  action
+) => ({
+  ...state,
+  ...action.data
+})

@@ -1,8 +1,7 @@
 
 import merge from '../src'
 import { arrayInsertReducer, arrayDeleteReducer } from '../src/arrayReducers'
-import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
-import { objectUpdateReducer } from '../src/updateReducers'
+import { objectInsertReducer, objectDeleteReducer, objectUpdateReducer } from '../src/objectReducers'
 import { printTree } from '../src/utils'
 
 const reducer = merge({
