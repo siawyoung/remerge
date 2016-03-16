@@ -30,8 +30,7 @@ We can represent the structure of such a state tree, as well as the mutations th
 ```js
 import merge from 'remerge'
 import { arrayInsertReducer, arrayDeleteReducer } from 'remerge/lib/arrayReducers'
-import { objectInsertReducer, objectDeleteReducer } from 'remerge/lib/objectReducers'
-import { objectUpdateReducer } from 'remerge/lib/updateReducers'
+import { objectInsertReducer, objectDeleteReducer, objectUpdateReducer } from 'remerge/lib/objectReducers'
 
 const reducer = merge({
   users: {

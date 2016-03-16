@@ -10,7 +10,7 @@ import deepFreeze from 'deep-freeze'
 
 import merge from '../src'
 import { objectInsertReducer, objectDeleteReducer } from '../src/objectReducers'
-import { objectUpdateReducer } from '../src/updateReducers'
+import { objectUpdateReducer } from '../src/objectReducers'
 
 const objectReducer = merge({
   models: {
