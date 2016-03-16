@@ -1,3 +1,9 @@
+**Note from Remerge**:
+
+The refactor diff can be found [here](https://github.com/siawyoung/remerge/commit/5b0123b0840c5cf755497207ec5070b50485f6e0). This diff shows how we refactored this example to use Remerge.
+
+The below is the original README.
+
 react-router-redux basic example
 =================================
 

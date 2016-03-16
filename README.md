@@ -18,9 +18,15 @@ Part 1 - Basics (this)
 
 [Part 5 - Debugging](docs/5-debugging.md)
 
+[Part 6 - Working with third party reducers](docs/6-legacy-reducers.md)
+
 #### Examples
 
 [Redux TodoMVC, refactored with Remerge](examples/todos)
+
+[React Router Redux basic example, refactored with Remerge](examples/react-router-redux)
+
+This example shows how Remerge can be used in conjunction with libraries that expose reducers to hook into Redux state, such as React Router Redux and Redux Form.
 
 ## Getting started
 
@@ -190,6 +196,8 @@ Then take a look at [`examples/convenience-reducers`](examples/convenience-reduc
 Example apps with ~~Redux integration~~ and generic JavaScript apps are coming soon!
 
 The `examples` folder now include [an example of using Remerge in a Redux app](examples/todos). The app itself was taken from [Redux's examples](https://github.com/reactjs/redux/tree/master/examples/todos), and refactored to use Remerge. The original tests have been rewritten to test Remerge's functionality as well, so if you're thinking of writing tests in your own app, this is a good starting point.
+
+**Update**: The `examples` folder has been updated to include [an example of using Remerge together with React Router Redux](examples/react-router-redux).
 
 ## Tests
 

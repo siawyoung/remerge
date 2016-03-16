@@ -1,5 +1,7 @@
 # Debugging Remerge
 
+>This section discusses how to debug when working with Remerge.
+
 For debugging purposes, the `merge` function also accepts a second optional argument. If set to `true`, the reducer will log out the path that actions take through the state tree. For example:
 
 ```js
@@ -49,3 +51,5 @@ The logs will look like this:
 [remerge] Navigating element node: users
 [remerge] Executing action at leaf node: delete
 ```
+
+Continue to [Part 6 - Working with third party reducers](./6-third-party-reducers.md).
