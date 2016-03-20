@@ -22,8 +22,9 @@ import {
 
 const collectionRegex = /^\$(.+)/
 const legacyRegex     = /^__(.+)__$/
+const remergeLegacyKey = '$legacy'
 
-const merge = (map, debugMode = false) => {
+const merge = (schema, debugMode = false) => {
 
   const _getAccessorKey = (key) => {
     // this regex tests if the key is of the form $abcd1234
@@ -45,26 +46,47 @@ const merge = (map, debugMode = false) => {
     }
   }
 
-  const _preprocess = (map) => {
-    const newMap = {}
+  const _preprocess = (schema) => {
+    const map = new Map()
+    function _dive(subSchema, prefix = '', path = [], params = []) {
+      for (const key in subSchema) {
+        if (key === '_') { continue }
+        const child = subSchema[key]
+        const type = `${prefix}${key}`
 
-    for (const key in map) {
-      if (key === '_') { continue }
-      if (newMap.$) {
-        consoleWarning(`More than one collection accessor ${newMap.$.accessorKeyName}`)
-        continue
-      }
+        if (isFunction(child)) {
+          const legacyKey = _getLegacyKey(key)
+          if (legacyKey) {
+            const node = {
+              reducer: child,
+              path: [legacyKey],
+            }
 
-      const valueIsFunction = isFunction(map[key])
-      newMap[key.replace(_getAccessorKey(key), "")] = {
-        isLeaf: valueIsFunction,
-        accessorKeyName: _getAccessorKey(key),
-        legacyKeyName: _getLegacyKey(key),
-        child: valueIsFunction ? map[key] : _preprocess(map[key])
+            const nodes = map.get(remergeLegacyKey) || []
+            map.set(remergeLegacyKey, [...nodes, node])
+          } else {
+            const node = {
+              reducer: child,
+              path,
+              params,
+            }
+
+            const nodes = map.get(type) || []
+            map.set(type, [...nodes, node])
+          }
+        } else {
+          const param = _getAccessorKey(key)
+          if (param) {
+            _dive(child, prefix, [...path, key], [...params, param])
+          } else {
+            _dive(child, `${type}.`, [...path, key], params)
+          }
+        }
       }
     }
 
-    return newMap
+    _dive(schema)
+    return map
   }
 
   const _initial = (map) => {
@@ -97,72 +119,40 @@ const merge = (map, debugMode = false) => {
     return changed ? newMap : null
   }
 
-  const _process = (_map, state, action) => {
-    const currentPath = action.type.split('.', 1)[0]
+  const _reduce = (state, action, node) => {
     let newState = clone(state)
-    let foundPath  = false
+    let current = newState
+    let parent = null
 
-    for (const path of Object.keys(_map)) {
-
-      const { accessorKeyName, isLeaf, child, legacyKeyName } = _map[path]
-      if (legacyKeyName) {
-        foundPath = true
-        consoleSuccess(`Executing legacy reducer ${legacyKeyName}`, debugMode)
-
-        const smallerState = getCollectionElement(newState, legacyKeyName)
-        setCollectionElement(newState, legacyKeyName, child(smallerState, action))
-      } else if (path === currentPath) {
-        foundPath = true
-
-        if (isLeaf) {
-          consoleSuccess(`Executing action at leaf node: ${currentPath}`, debugMode)
-          return child(newState, action)
-
-        } else {
-          const collectionKeyName = child.$ && child.$.accessorKeyName
-          const collectionKey = action && action[collectionKeyName]
-
-          // child is a collection and we should enter because accessor key name is given
-          if (collectionKeyName && collectionKey !== undefined) {
-            consoleSuccess(`Navigating collection node: ${currentPath}`, debugMode)
-            let newCollection = clone(getCollectionElement(newState, path))
-            const smallerMap = child.$.child
-            const smallerState = getCollectionElement(newCollection, collectionKey)
-            const smallerAction = {
-              ...action,
-              type: action.type.split('.').splice(1).join(".")
-            }
-
-            const newSmallerState = _process(smallerMap, smallerState, smallerAction)
-            setCollectionElement(newCollection, collectionKey, newSmallerState)
-            setCollectionElement(newState, path, newCollection)
-          } else {
-            consoleSuccess(`Navigating element node: ${currentPath}`, debugMode)
-            const smallerMap = child
-            const smallerState = getCollectionElement(newState, path)
-            const smallerAction = {
-              ...action,
-              type: action.type.split('.').splice(1).join(".")
-            }
-            const newSmallerState = _process(smallerMap, smallerState, smallerAction)
-            setCollectionElement(newState, path, newSmallerState)
-          }
-        }
+    for (let key of node.path) {
+      let accessorKey = _getAccessorKey(key)
+      if (accessorKey) {
+        parent = current
+        current = clone(getCollectionElement(current, action[accessorKey]))
+        setCollectionElement(parent, action[accessorKey], current)
+      } else {
+        parent = current
+        current = clone(getCollectionElement(current, key))
+        setCollectionElement(parent, key, current)
       }
     }
 
-    if (!foundPath) {
-      consoleError(`Could not find path: ${currentPath}`, debugMode)
-    }
+    current = node.reducer(current, action)
 
+    const lastKey = node.path[node.path.length-1]
+    let accessorKey = _getAccessorKey(lastKey)
+    if (accessorKey) {
+      setCollectionElement(parent, action[accessorKey], current)
+    } else {
+      setCollectionElement(parent, lastKey, current)
+    }
     return newState
   }
 
-  const initialState = _initial(map)
-  const computedMap = _preprocess(map)
+  const initialState = _initial(schema)
+  const map = _preprocess(schema)
 
   return (state, action) => {
-
     if (action === undefined) {
       consoleMessage(`Setting up initial state tree`, debugMode)
     } else if (!action.type) {
@@ -173,9 +163,25 @@ const merge = (map, debugMode = false) => {
       return initialState
     }
 
-    consoleGrouped(`Received action with type: ${action.type}`, debugMode)
-    const newState = _process(computedMap, state, action)
-    consoleEndGrouped(null, debugMode)
+    let newState = state
+    const nodes = map.get(action.type)
+    if (nodes) {
+      for (let node of nodes) {
+        const valid = node.params.map((p) => action[p]).reduce((prev, curr) => (prev && curr !== undefined), true)
+        if (valid) {
+          newState = _reduce(newState, action, node)
+          break
+        }
+      }
+    } else {
+      const legacyNodes = map.get(remergeLegacyKey)
+      for (let node of legacyNodes) {
+        newState = _reduce(newState, action, node)
+      }
+    }
+    // consoleGrouped(`Received action with type: ${action.type}`, debugMode)
+    // const newState = _process(computedMap, state, action)
+    // consoleEndGrouped(null, debugMode)
 
     return newState
   }

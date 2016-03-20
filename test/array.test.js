@@ -238,3 +238,24 @@ test('Delete field of model', (t) => {
 
   t.same(arrayReducer(stateBefore, action), stateAfter)
 })
+
+test('Array add test', (t) => {
+  const startTime = process.hrtime()
+  const action = {
+    type  : 'models.add',
+    data: {
+      name: 'model'
+    }
+  }
+
+  let state = {
+    models: []
+  }
+
+  for(let i = 0; i < 1000; i++) {
+    state = arrayReducer(state, action)
+  }
+
+  const endTime = process.hrtime(startTime)
+  console.info("Execution time: %ds %dms", endTime[0], endTime[1]/1000000)
+})

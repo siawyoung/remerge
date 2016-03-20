@@ -22,6 +22,17 @@ const legacyReducer = (
   }
 }
 
+const anotherLegacyReducer = (
+  state = "initial state",
+  action
+) => {
+  if (action.type === "LEGACY_ACTION_TYPE_2") {
+    return "legacy state"
+  } else {
+    return state
+  }
+}
+
 const reducer = merge({
   _: {
     someTopLevelInitialState: 1
@@ -31,7 +42,8 @@ const reducer = merge({
     add: arrayInsertReducer,
     delete: arrayDeleteReducer,
   },
-  __legacy__: legacyReducer
+  __legacy__: legacyReducer,
+  __anotherLegacy__: anotherLegacyReducer
 }, true)
 
 test("Initial state for legacy reducer", (t) => {
@@ -39,7 +51,8 @@ test("Initial state for legacy reducer", (t) => {
   const stateAfter = {
     someTopLevelInitialState: 1,
     models: [],
-    legacy: "initial state"
+    legacy: "initial state",
+    anotherLegacy: "initial state"
   }
 
   deepFreeze(stateAfter)
@@ -111,12 +124,14 @@ test("Legacy test", (t) => {
 
   const stateBefore = {
     models: [],
-    legacy: undefined
+    legacy: undefined,
+    anotherLegacy: undefined,
   }
 
   const stateAfter = {
     models: [],
-    legacy: "legacy state"
+    legacy: "legacy state",
+    anotherLegacy: "initial state"
   }
 
   deepFreeze(action)
@@ -127,3 +142,32 @@ test("Legacy test", (t) => {
 
 })
 
+test("Multiple legacy test", (t) => {
+
+  const action = {
+    type: "LEGACY_ACTION_TYPE_1"
+  }
+
+  const action2 = {
+    type: "LEGACY_ACTION_TYPE_2"
+  }
+
+  const stateBefore = {
+    models: [],
+    legacy: undefined,
+    anotherLegacy: undefined,
+  }
+
+  const stateAfter = {
+    models: [],
+    legacy: "legacy state",
+    anotherLegacy: "legacy state",
+  }
+
+  deepFreeze(action)
+  deepFreeze(stateBefore)
+  deepFreeze(stateAfter)
+
+  t.same(reducer(reducer(stateBefore, action), action2), stateAfter)
+
+})
