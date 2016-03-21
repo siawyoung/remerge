@@ -154,14 +154,17 @@ const merge = (schema, debugMode = false) => {
 
   return (state, action) => {
     if (action === undefined) {
-      consoleMessage(`Setting up initial state tree`, debugMode)
+      consoleMessage(debugMode, `Setting up initial state tree`)
     } else if (!action.type) {
-      consoleError(`Action is missing type`, debugMode)
+      consoleError(debugMode, `Action is missing type`)
     }
 
     if (state === undefined) {
       return initialState
     }
+
+    let successLogs = []
+    let errorLogs = []
 
     let newState = state
     const nodes = map.get(action.type)
@@ -169,19 +172,42 @@ const merge = (schema, debugMode = false) => {
       for (let node of nodes) {
         const valid = node.params.map((p) => action[p]).reduce((prev, curr) => (prev && curr !== undefined), true)
         if (valid) {
+          successLogs.push(`Executing action ${action.type}`)
+          for (let param of node.params) {
+            successLogs.push(`$${param} = ${action[param]}`)
+          }
+
           newState = _reduce(newState, action, node)
           break
+        } else {
+          errorLogs.push(`Could not execute action ${action.type} with params ${node.params}`)
         }
       }
     } else {
       const legacyNodes = map.get(remergeLegacyKey)
       for (let node of legacyNodes) {
+        successLogs.push(`Executing legacy action ${action.type}`)
         newState = _reduce(newState, action, node)
       }
     }
-    // consoleGrouped(`Received action with type: ${action.type}`, debugMode)
-    // const newState = _process(computedMap, state, action)
-    // consoleEndGrouped(null, debugMode)
+
+    if (successLogs.length > 0) {
+      consoleGrouped(debugMode, `Processing action ${action.type}`)
+      for (let log of successLogs) {
+        consoleSuccess(debugMode, log)
+      }
+      consoleEndGrouped(debugMode)
+    } else if (errorLogs.length > 0) {
+      consoleGrouped(debugMode, `Processing action ${action.type}`, false)
+      for (let log of errorLogs) {
+        consoleSuccess(debugMode, log)
+      }
+      consoleEndGrouped(debugMode)
+    } else {
+      consoleGrouped(debugMode, `Processing action ${action.type}`, false)
+      consoleError(debugMode, 'No available action found!')
+      consoleEndGrouped(debugMode)
+    }
 
     return newState
   }

@@ -28,7 +28,7 @@ const arrayReducer = merge({
       }
     }
   }
-}, true)
+}, false)
 
 
 test('Initial state', (t) => {

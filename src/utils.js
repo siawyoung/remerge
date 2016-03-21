@@ -51,39 +51,47 @@ const colors = {
     brown  : "font-weight : bold; color : #AB7967;"
 }
 
-export function consoleMessage(msg, debugMode) {
-  if (debugMode) {
-    console.log(`%c[remerge]%c ${msg}`, colors.black, '')
+function _console(msg, color, func = console.log) {
+  if (typeof window === 'undefined') {
+    func(`[remerge] ${msg}`)
+  } else {
+    func.call(console, `%c[remerge]%c ${msg}`, color, '')
   }
 }
 
-export function consoleWarning(msg, debugMode) {
+export function consoleMessage(debugMode, msg) {
   if (debugMode) {
-    console.log(`%c[remerge]%c ${msg}`, colors.yellow, '')
+    _console(msg, colors.black)
   }
 }
 
-export function consoleSuccess(msg, debugMode) {
+export function consoleWarning(debugMode, msg) {
   if (debugMode) {
-    console.log(`%c[remerge]%c ${msg}`, colors.green, '')
+    _console(msg, colors.yellow)
   }
 }
 
-export function consoleError(msg, debugMode) {
+export function consoleSuccess(debugMode, msg) {
   if (debugMode) {
-    console.error(`%c[remerge]%c ${msg}`, colors.red, '')
+    _console(msg, colors.green)
   }
 }
 
-export function consoleGrouped(msg, debugMode) {
-  if (debugMode && console.groupCollapsed) {
-    console.groupCollapsed(`%c[remerge]%c ${msg}`, colors.black, '')
+export function consoleError(debugMode, msg) {
+  if (debugMode) {
+    _console(msg, colors.red)
+  }
+}
+
+export function consoleGrouped(debugMode, msg, collapsed = true) {
+  if (debugMode && console.group) {
+    _console(msg, colors.black, collapsed ? console.groupCollapsed : console.group)
   } else if (debugMode) {
-    console.log(`%c[remerge]%c ${msg}`, colors.black, '')
+    _console(msg, colors.black)
   }
 }
 
-export function consoleEndGrouped(msg, debugMode) {
+export function consoleEndGrouped(debugMode) {
   if (debugMode && console.groupEnd) {
     console.groupEnd()
   }
